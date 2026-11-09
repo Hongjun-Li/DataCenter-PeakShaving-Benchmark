@@ -91,23 +91,23 @@ Participants must not change physical plant models, weather inputs, renewable ge
 ### 5.1 Primary metric: peak reduction percentage
 Let:
 
-- \(P_{\mathrm{peak,idle}}\): maximum Day 1 grid import in the Battery-Idle baseline, in watts.
+- $P_{\mathrm{peak,idle}}$: maximum Day 1 grid import in the Battery-Idle baseline, in watts.
 
-- \(P_{\mathrm{peak,submission}}\): maximum Day 1 grid import in the submitted controller simulation, in watts.
+- $P_{\mathrm{peak,submission}}$: maximum Day 1 grid import in the submitted controller simulation, in watts.
 
 The raw reduction is:
 
-\[
+$$
 \Delta P_{\mathrm{peak}} = P_{\mathrm{peak,idle}} - P_{\mathrm{peak,submission}}
-\]
+$$
 
-\[
+$$
 R_{\mathrm{raw}} = 100\frac{P_{\mathrm{peak,idle}} - P_{\mathrm{peak,submission}}}{P_{\mathrm{peak,idle}}}
-\]
+$$
 
 The evaluator computes the peak from `gri.P.real` over **86400–172800 s** using the corresponding MAT results. A fixed **100 W near-zero tolerance** avoids reporting a misleading negative score for negligible numerical differences between the idle and Starter models:
 
-\[
+$$
 R_{\mathrm{normalized}} =
 
 \begin{cases}
@@ -117,25 +117,25 @@ R_{\mathrm{normalized}} =
 \max(0,R_{\mathrm{raw}}), & \text{otherwise}
 
 \end{cases}
-\]
+$$
 
-For a submission passing all implemented validity checks, the final numerical score (in percent) equals \(R_{\mathrm{normalized}}\). If the implemented checks fail, the final score is **0%**. A zero score does not by itself distinguish an invalid run from a valid controller with no measured improvement; consult the reported `Benchmark valid` field.
+For a submission passing all implemented validity checks, the final numerical score (in percent) equals $R_{\mathrm{normalized}}$. If the implemented checks fail, the final score is **0%**. A zero score does not by itself distinguish an invalid run from a valid controller with no measured improvement; consult the reported `Benchmark valid` field.
 
 The Reference Controller's `PGridTarget = 550e3` W is **an internal tunable control target, not a benchmark pass/fail threshold**.
 
 ### 5.2 Implemented validity checks
 The current scoring scripts check the following within the evaluation period unless otherwise stated:
 
-1. **SOC bounds:** \(0.10\leq SOC\leq0.90\), with the evaluator's small numerical tolerance.
+1. **SOC bounds:** $0.10\leq SOC\leq0.90$, with the evaluator's small numerical tolerance.
 
 2. **Command power bounds:** maximum charge at most +200 kW; maximum discharge magnitude at most 400 kW.
 
 3. **Evaluation-day net SOC depletion:**
 
-   \[
+   $$
    SOC(86400)-SOC(172800)\leq0.25
 
-   \]
+   $$
 
 4. **Time range:** both the baseline and submitted results begin at approximately 0 s and end at approximately 172800 s or later.
 
@@ -411,3 +411,4 @@ After first use, an **additional local folder** `Buildings 14.0.0/` is created a
 For a future source ZIP, retain the same repository layout and the installer. Any offline archive bundling Buildings Library files must also include and preserve the applicable third-party license material. The complete unified runner was regression-tested after integrating the installer, but a fresh-machine clone-and-run test remains a useful publication check.
 
 For blind benchmarking, distribute a separate participant package without the Reference controller; confirm that the participant package still contains everything required by the intended evaluation procedure.
+
