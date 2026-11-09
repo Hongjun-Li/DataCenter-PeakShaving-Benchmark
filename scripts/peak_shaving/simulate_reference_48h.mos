@@ -1,0 +1,35 @@
+
+loadModel(Modelica, {"4.1.0"});
+getErrorString();
+
+loadFile("Buildings 14.0.0/package.mo");
+getErrorString();
+
+loadFile("models/WindTurbineWithPowerOutput.mo");
+getErrorString();
+
+loadFile("models/peak_shaving/GridBaseEstimator.mo");
+getErrorString();
+
+loadFile("models/peak_shaving/GridPowerSampler.mo");
+getErrorString();
+
+loadFile("benchmark/reference/GridAwareBatteryControlFast.mo");
+getErrorString();
+
+loadFile("benchmark/reference/RenewablesReference.mo");
+getErrorString();
+
+checkModel(RenewablesReference);
+getErrorString();
+
+simulate(
+  RenewablesReference,
+  startTime=0,
+  stopTime=172800,
+  numberOfIntervals=192,
+  tolerance=1e-6,
+  outputFormat="mat",
+  fileNamePrefix="RenewablesReference48h"
+);
+getErrorString();

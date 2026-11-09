@@ -1,0 +1,44 @@
+﻿# ==================================================
+# Buildrix: generated OpenModelica files
+# Only ignore generated files at repository root.
+# ==================================================
+
+/*_res.mat
+/*_res.csv
+/*_res.plt
+
+/*.o
+/*.obj
+/*.exe
+/*.makefile
+/*.libs
+/*.log
+
+/*_init.xml
+/*_info.json
+/*_external_functions.json
+/*_Jac*.bin
+
+# Generated source and header files at root
+/*.c
+/*.h
+
+# Generated executables at root
+/Renewables*
+/Test*
+
+# Benchmark runtime logs
+/benchmark/evaluation/*.log
+
+# Temporary files at repository root
+/*.backup.mat
+/*.generated.mat
+
+# Editor metadata
+/.vscode/
+/.idea/
+.DS_Store
+Thumbs.db
+
+# Third-party library: installed separately
+/Buildings 14.0.0/

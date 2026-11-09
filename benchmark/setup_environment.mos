@@ -1,0 +1,15 @@
+﻿
+print("=== DataCenter-PeakShaving-Benchmark Modelica Environment Setup ===\n");
+
+installed := installPackage(Modelica, "4.1.0", true);
+
+print("Modelica 4.1.0 installation result: " +
+  String(installed) + "\n");
+
+loaded := loadModel(Modelica, {"4.1.0"});
+
+print("Modelica 4.1.0 load result: " +
+  String(loaded) + "\n");
+
+print(getErrorString());
+

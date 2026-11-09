@@ -1,0 +1,23 @@
+
+loadModel(Modelica, {"4.1.0"});
+getErrorString();
+
+loadFile("Buildings 14.0.0/package.mo");
+getErrorString();
+
+loadFile("models/WindTurbineWithPowerOutput.mo");
+getErrorString();
+
+loadFile("models/peak_shaving/RenewablesBatteryIdleWithWindOutput.mo");
+getErrorString();
+
+simulate(
+  RenewablesBatteryIdleWithWindOutput,
+  startTime=0,
+  stopTime=172800,
+  numberOfIntervals=192,
+  tolerance=1e-6,
+  outputFormat="mat",
+  fileNamePrefix="RenewablesBatteryIdleWind48h"
+);
+getErrorString();

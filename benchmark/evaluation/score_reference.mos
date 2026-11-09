@@ -1,0 +1,175 @@
+﻿
+idleFile := "RenewablesBatteryIdleWind48h_res.mat";
+controlFile := "RenewablesReference48h_res.mat";
+
+idleData := readSimulationResult(
+  idleFile,
+  {time, gri.P.real},
+  0
+);
+
+controlData := readSimulationResult(
+  controlFile,
+  {time, gri.P.real, bat.SOC, bat.P},
+  0
+);
+
+idleStartTime := idleData[1,1];
+idleEndTime := idleData[1,size(idleData,2)];
+
+controlStartTime := controlData[1,1];
+controlEndTime := controlData[1,size(controlData,2)];
+
+timeValid :=
+  abs(idleStartTime) <= 1e-3 and
+  idleEndTime >= 172800 - 1e-3 and
+  abs(controlStartTime) <= 1e-3 and
+  controlEndTime >= 172800 - 1e-3;
+
+dataValid := true;
+idleCount := 0;
+controlCount := 0;
+
+for i in 1:size(idleData, 2) loop
+  if idleData[1,i] >= 86400 and idleData[1,i] <= 172800 then
+    idleCount := idleCount + 1;
+
+    if idleData[2,i] <> idleData[2,i] or
+       abs(idleData[2,i]) > 1e9 then
+      dataValid := false;
+    end if;
+  end if;
+end for;
+
+for i in 1:size(controlData, 2) loop
+  if controlData[1,i] >= 86400 and controlData[1,i] <= 172800 then
+    controlCount := controlCount + 1;
+
+    if controlData[2,i] <> controlData[2,i] or
+       controlData[3,i] <> controlData[3,i] or
+       controlData[4,i] <> controlData[4,i] or
+       abs(controlData[2,i]) > 1e9 or
+       abs(controlData[3,i]) > 10 or
+       abs(controlData[4,i]) > 1e9 then
+      dataValid := false;
+    end if;
+  end if;
+end for;
+
+dataValid := dataValid and idleCount > 0 and controlCount > 0;
+
+idlePeak := -1e99;
+controlPeak := -1e99;
+
+minSOC := 1e99;
+maxSOC := -1e99;
+
+maxCharge := -1e99;
+maxDischarge := 1e99;
+
+for i in 1:size(idleData, 2) loop
+  if idleData[1,i] >= 86400 and idleData[1,i] <= 172800 then
+    idlePeak := max(idlePeak, idleData[2,i]);
+  end if;
+end for;
+
+for i in 1:size(controlData, 2) loop
+  if controlData[1,i] >= 86400 and controlData[1,i] <= 172800 then
+
+    controlPeak := max(controlPeak, controlData[2,i]);
+
+    minSOC := min(minSOC, controlData[3,i]);
+    maxSOC := max(maxSOC, controlData[3,i]);
+
+    maxCharge := max(maxCharge, controlData[4,i]);
+    maxDischarge := min(maxDischarge, controlData[4,i]);
+
+  end if;
+end for;
+
+socStart := val(bat.SOC, 86400, controlFile);
+socEnd := val(bat.SOC, 172800, controlFile);
+
+maxNetSOCDepletion := 0.25;
+
+netSOCDepletion := socStart - socEnd;
+
+energyFairnessValid :=
+  netSOCDepletion <= maxNetSOCDepletion + 1e-6;
+
+peakReduction := idlePeak-controlPeak;
+peakReductionRate := 100*peakReduction/idlePeak;
+
+peakTolerance := 100.0;
+
+normalizedScore := if abs(peakReduction) <= peakTolerance then
+  0.0
+else
+  max(0.0, peakReductionRate);
+
+socValid := minSOC >= 0.10-1e-6 and maxSOC <= 0.90+1e-6;
+
+powerValid :=
+  maxCharge <= 200e3+1e-3 and
+  maxDischarge >= -400e3-1e-3;
+
+print("\n===== DATACENTER-PEAKSHAVING-BENCHMARK BENCHMARK SCORE =====\n");
+
+print("Idle peak [kW]: " +
+  String(idlePeak/1000) + "\n");
+
+print("Controlled peak [kW]: " +
+  String(controlPeak/1000) + "\n");
+
+print("Peak reduction [kW]: " +
+  String(peakReduction/1000) + "\n");
+
+print("Peak reduction [%]: " +
+  String(peakReductionRate) + "\n");
+
+print("Normalized benchmark score [%]: " +
+  String(normalizedScore) + "\n");
+
+print("Minimum SOC: " + String(minSOC) + "\n");
+print("Maximum SOC: " + String(maxSOC) + "\n");
+
+print("Maximum charge [kW]: " +
+  String(maxCharge/1000) + "\n");
+
+print("Maximum discharge [kW]: " +
+  String(maxDischarge/1000) + "\n");
+
+print("SOC start: " + String(socStart) + "\n");
+print("SOC end: " + String(socEnd) + "\n");
+
+print("SOC change: " +
+  String(socEnd-socStart) + "\n");
+
+print("SOC constraints valid: " +
+  String(socValid) + "\n");
+
+print("Power constraints valid: " +
+  String(powerValid) + "\n");
+
+print("Energy fairness valid: " +
+  String(energyFairnessValid) + "\n");
+
+print("Time range valid: " + String(timeValid) + "\n");
+
+print("Data valid: " + String(dataValid) + "\n");
+
+print("Benchmark valid: " +
+  String(socValid and powerValid and energyFairnessValid and timeValid and dataValid) + "\n");
+
+print("Final benchmark score [%]: " +
+  String(
+    if socValid and powerValid and energyFairnessValid and timeValid and dataValid
+    then normalizedScore
+    else 0.0
+  ) + "\n");
+
+getErrorString();
+
+
+
+
