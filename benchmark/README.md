@@ -109,13 +109,9 @@ The evaluator computes the peak from `gri.P.real` over **86400–172800 s** usin
 
 $$
 R_{\mathrm{normalized}} =
-
 \begin{cases}
-
-0, & |\Delta P_{\mathrm{peak}}|\leq 100\ \mathrm{W}\\
-
+0, & |\Delta P_{\mathrm{peak}}| \leq 100\ \mathrm{W}\\
 \max(0,R_{\mathrm{raw}}), & \text{otherwise}
-
 \end{cases}
 $$
 
@@ -411,4 +407,5 @@ After first use, an **additional local folder** `Buildings 14.0.0/` is created a
 For a future source ZIP, retain the same repository layout and the installer. Any offline archive bundling Buildings Library files must also include and preserve the applicable third-party license material. The complete unified runner was regression-tested after integrating the installer, but a fresh-machine clone-and-run test remains a useful publication check.
 
 For blind benchmarking, distribute a separate participant package without the Reference controller; confirm that the participant package still contains everything required by the intended evaluation procedure.
+
 
